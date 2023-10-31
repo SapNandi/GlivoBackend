@@ -1,0 +1,256 @@
+User Routes
+1) End Point : /api/v1/register [POST]
+Response : 
+{
+  "success": true,
+  "user": {
+    "avatar": {
+      "public_id": "",
+      "url": ""
+    },
+    "_id": "6523080440f3775c9b84a161",
+    "name": "sample1",
+    "email": "sample1@gmail.com",
+    "password": "$2a$10$L2BONh58MEqJZJNtiAKn7e.8tloqLbXVnhRWmG.CjO/bbEfwZdYja",
+    "country" : "",
+    "state" : "",
+    "role": "seller/buyer",
+    "createdAt": "2023-10-08T19:50:28.816Z",
+    "__v": 0
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MjMwODA0NDBmMzc3NWM5Yjg0YTE2MSIsImlhdCI6MTY5NzUxNTk4MywiZXhwIjoxNjk3OTQ3OTgzfQ.6QU6jJiCObb6XI7F8xufaucArTgxfB-jal5yJRkcGpU"
+}
+
+2) End Point : /api/v1/login [POST]
+Response : 
+{
+  "success": true,
+  "user": {
+    "avatar": {
+      "public_id": "",
+      "url": ""
+    },
+    "_id": "6523080440f3775c9b84a161",
+    "name": "sample1",
+    "email": "sample1@gmail.com",
+    "password": "$2a$10$L2BONh58MEqJZJNtiAKn7e.8tloqLbXVnhRWmG.CjO/bbEfwZdYja",
+    "country" : "",
+    "state" : "",
+    "role": "seller/buyer",
+    "role": "admin",
+    "createdAt": "2023-10-08T19:50:28.816Z",
+    "__v": 0
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MjMwODA0NDBmMzc3NWM5Yjg0YTE2MSIsImlhdCI6MTY5NzUxNTk4MywiZXhwIjoxNjk3OTQ3OTgzfQ.6QU6jJiCObb6XI7F8xufaucArTgxfB-jal5yJRkcGpU"
+}
+
+3) End Point : api/v1/logout [GET]
+
+4) End Point : api/v1/me [GET]
+Response : 
+{
+  "success": true,
+  "user": {
+    "avatar": {
+      "public_id": "",
+      "url": ""
+    },
+    "_id": "6523080440f3775c9b84a161",
+    "name": "sample1",
+    "email": "sample1@gmail.com",
+    "role": "admin",
+    "createdAt": "2023-10-08T19:50:28.816Z",
+    "__v": 0
+  }
+}
+
+5) End Point : /api/v1/password/forgot [POST]
+6) End Point : /api/v1/password/reset [PUT]
+7) End Point : /api/v1/me/update [POST]
+Response : 
+{
+  "success": true,
+}
+
+
+Product Schema
+
+{
+  name: {
+    type: String,
+    required: [true, "Please Enter Lawyer Name"],
+    trim: true,
+  },
+  description: {
+    type: String,
+    required: [true, "Please Enter product Description"],
+  },
+  price: {
+    type: Number,
+    required: [true, "Please Enter product Price"],
+    maxLength: [8, "Price cannot exceed 8 characters"],
+  },
+  ratings: {
+    type: Number,
+    default: 0,
+  },
+  images: {
+    public_id: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+  },
+
+  bgImage: {
+    public_id: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+  },
+  category: {
+    type: String,
+    required: [true, "Please Enter Lawyer Category"],
+  },
+  numOfReviews: {
+    type: Number,
+    default: 0,
+  },
+  reviews: [
+    {
+      uname: {  //User gave the reviews
+        type: String,
+        required: true,
+      },
+      rating: {
+        type: Number,
+        required: true,
+      },
+      comment: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
+  user: {  //User Created The Product
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+}
+
+Product Routes
+
+1) End Point : /api/v1/product/new [POST]
+Response : 
+{
+  "success": true,
+  "product": {
+    "images": {
+      "public_id": "",
+      "url": ""
+    },
+    "bgImage": {
+      "public_id": "",
+      "url": ""
+    },
+    "ratings": 0,
+    "numOfReviews": 0,
+    "_id": "63701d24f03239c72c00018f",
+    "name": "Killy Fidian",
+    "price": 649.77,
+    "description": "Removal of Drain Dev from L Metatarsophal Jt, Perc Approach",
+    "category": "accessories",
+    "rating": 4.84,
+    "supply": 633,
+    "__v": 0,
+    "createdAt": "2023-09-26T08:30:51.901Z",
+    "updatedAt": "2023-09-26T08:30:51.901Z",
+    "reviews": []
+  }
+}
+
+2) End Point : /api/v1/product [GET]
+Response : 
+{
+  "success": true,
+  "productCount": 26,
+  "product": [
+    {
+      "images": {
+        "public_id": "",
+        "url": ""
+      },
+      "bgImage": {
+        "public_id": "",
+        "url": ""
+      },
+      "ratings": 0,
+      "numOfReviews": 0,
+      "_id": "63701d24f03239b7f7000015",
+      "name": "Loleta Meach",
+      "price": 555.73,
+      "description": "Supplement Head & Neck Tendon with Autol Sub, Open Approach",
+      "category": "shoes",
+      "rating": 1.5,
+      "supply": 880,
+      "__v": 0,
+      "createdAt": "2023-09-26T08:30:51.901Z",
+      "updatedAt": "2023-09-26T08:30:51.901Z",
+      "reviews": []
+    }
+  ]
+
+3) End Point : /api/v1/product/:id [PUT]
+Response : 
+{
+  "success": true,
+  "message": "Product Updated"
+}
+
+4) End Point : /api/v1/product/:id [DELETE]
+Response : 
+{
+  "success": true,
+  "message": "Product Updated"
+}
+
+5) End Point : /api/v1/product/:id [GET]
+Response : 
+{
+  "success": true,
+  "product": {
+    "images": {
+      "public_id": "",
+      "url": ""
+    },
+    "bgImage": {
+      "public_id": "",
+      "url": ""
+    },
+    "ratings": 0,
+    "numOfReviews": 0,
+    "_id": "63701d24f03239c72c00018f",
+    "name": "Killy Fidian",
+    "price": 649.77,
+    "description": "Removal of Drain Dev from L Metatarsophal Jt, Perc Approach",
+    "category": "accessories",
+    "rating": 4.84,
+    "supply": 633,
+    "__v": 0,
+    "createdAt": "2023-09-26T08:30:51.901Z",
+    "updatedAt": "2023-09-26T08:30:51.901Z",
+    "reviews": []
+  }
+}
