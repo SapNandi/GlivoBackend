@@ -10,7 +10,7 @@ const errorMiddleware = require("./Middleware/error");
 // Middleware
 // app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(
-  cors({ origin: "https://glivo-frontend.vercel.app", credentials: true })
+  cors({ origin: "https://glivo-frontend-testing.vercel.app/", credentials: true })
 );
 app.use(express.json());
 app.use(cookieParser());
