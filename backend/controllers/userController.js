@@ -12,7 +12,6 @@ const catchAsyncErrors = require("../Middleware/catchAsyncErrors");
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
   const { name, email, password, country, state } = req.body;
 
-  
   const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
     folder: "avatar",
     width: 150,
@@ -62,6 +61,9 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
 exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
   });
 
   res.status(200).json({
