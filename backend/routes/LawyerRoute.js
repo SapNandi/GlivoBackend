@@ -7,6 +7,7 @@ const {
   getLawyerDetails,
   rateReviewLawyer,
   getAllReview,
+  getMyLawyer
 } = require("../controllers/lawyerController");
 
 const { isAuthenticatedUser, authorizeRoles } = require("../Middleware/auth");
@@ -14,6 +15,8 @@ const { isAuthenticatedUser, authorizeRoles } = require("../Middleware/auth");
 const router = express.Router();
 
 router.route("/lawyer").get(getAllLawyers);
+
+router.route("/lawyer/my").get(isAuthenticatedUser, authorizeRoles("admin") ,getMyLawyer);
 
 router
   .route("/lawyer/feedback/:id")

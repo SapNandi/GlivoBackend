@@ -19,7 +19,7 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
   });
 
   orderItems.forEach(async (order) => {
-    await updateStock(order.product, order.quantity);
+    await updateStock(order.product, order.quantity, order.type);
   });
 
   res.status(201).json({
@@ -101,11 +101,14 @@ exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-async function updateStock(id, quantity) {
+async function updateStock(id, quantity, type) {
   const product = await Lawyer.findById(id);
   // console.log(id);
-
-  product.supply -= quantity;
+  if (type === "VIP") {
+    product.special_supply -= quantity;
+  } else {
+    product.supply -= quantity;
+  }
 
   await product.save({ validateBeforeSave: false });
 }

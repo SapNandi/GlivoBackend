@@ -57,10 +57,18 @@ const lawyerSchema = new mongoose.Schema({
     default: 1,
   },
 
+  special_supply: {
+    type: Number,
+    required: [true, "Please Enter special product Stock"],
+    maxLength: [4, "Stock cannot exceed 4 characters"],
+    default: 0,
+  },
+
   numOfReviews: {
     type: Number,
     default: 0,
   },
+
   reviews: [
     {
       uname: {

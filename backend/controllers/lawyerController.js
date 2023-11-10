@@ -14,7 +14,7 @@ exports.createLawyer = CatchAsyncErrors(async (req, res, next) => {
 
   const user = await User.findById(req.user.id);
 
-  const { name, description, price, category } = req.body;
+  const { name, description, price, category, supply } = req.body;
 
   const myCloud = await cloudinary.v2.uploader.upload(req.body.images, {
     folder: "productavatar",
@@ -33,6 +33,7 @@ exports.createLawyer = CatchAsyncErrors(async (req, res, next) => {
     description,
     price,
     category,
+    supply,
     images: {
       public_id: myCloud.public_id,
       url: myCloud.secure_url,
@@ -113,7 +114,7 @@ exports.getAllReview = catchAsyncErrors(async (req, res, next) => {
 // Get All Lawyer
 
 exports.getAllLawyers = CatchAsyncErrors(async (req, res) => {
-  let resultPerPage = 10;
+  let resultPerPage = 12;
   const lawyerCount = await Lawyer.countDocuments();
 
   const apiFeature = new ApiFeatures(Lawyer.find(), req.query)
@@ -127,6 +128,21 @@ exports.getAllLawyers = CatchAsyncErrors(async (req, res) => {
   res.status(200).json({
     success: true,
     lawyerCount: lawyerCount,
+    lawyer,
+  });
+});
+
+// My Events ---> Admin
+
+exports.getMyLawyer = CatchAsyncErrors(async (req, res, next) => {
+  const lawyer = await Lawyer.find({user: req.user.id});
+
+  if (!lawyer) {
+    return next(new ErrorHandler("Lawyer not found!!", 404));
+  }
+
+  res.status(200).json({
+    success: true,
     lawyer,
   });
 });
