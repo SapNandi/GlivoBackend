@@ -1,5 +1,6 @@
 const Order = require("../models/orderModel");
 const Lawyer = require("../models/lawyerModel");
+const User = require("../models/userModel");
 const ErrorHander = require("../utils/ErrorHandler");
 const catchAsyncErrors = require("../Middleware/catchAsyncErrors");
 
@@ -7,6 +8,8 @@ const catchAsyncErrors = require("../Middleware/catchAsyncErrors");
 exports.newOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, paymentInfo, itemsPrice, taxPrice, totalPrice } =
     req.body;
+
+  const user = await User.findById(req.user.id);
 
   const order = await Order.create({
     orderItems,
@@ -20,7 +23,23 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
 
   orderItems.forEach(async (order) => {
     await updateStock(order.product, order.quantity, order.type);
+    const lawyer = await Lawyer.findById(order.product);
+    const details = {
+      username: user.name,
+      email: user.email,
+    };
+    // if (!lawyer.customer.includes(details.email)) {
+    //   console.log(lawyer.customer.find);
+    //   // lawyer.customer.push(details);
+    // }
+    const itemExist =  lawyer.customer.find((i)=> i.email === details.email)
+    if(!itemExist){
+      lawyer.customer.push(details);
+    }
+    await lawyer.save({ validateBeforeSave: false });
   });
+
+  // const
 
   res.status(201).json({
     success: true,

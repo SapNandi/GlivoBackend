@@ -24,6 +24,11 @@ const orderSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      type: {
+        type: String,
+        required: true,
+        default: "Normal",
+      },
     },
   ],
   user: {

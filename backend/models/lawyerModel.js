@@ -90,6 +90,12 @@ const lawyerSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  customer: [
+    {
+      username: { type: String, required: true },
+      email: { type: String, required: true },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
