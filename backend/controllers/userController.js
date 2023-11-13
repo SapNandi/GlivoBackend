@@ -4,6 +4,7 @@ const cloudinary = require("cloudinary");
 const CatchAsyncErrors = require("../Middleware/catchAsyncErrors");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
+const sendSms = require("../utils/sendSms");
 
 const User = require("../models/userModel");
 const catchAsyncErrors = require("../Middleware/catchAsyncErrors");
@@ -47,7 +48,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Email and Password", 401));
   }
 
-  const isPassword = user.comparePassword(password);
+  const isPassword = await user.comparePassword(password);
 
   if (!isPassword) {
     return next(new ErrorHandler("Invalid Email and Password", 401));
@@ -241,4 +242,97 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "User Deleted Successfully",
   });
+});
+
+// Request OTP for verification
+
+exports.requestOtp = catchAsyncErrors(async (req, res, next) => {
+  // sendSms();
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found!!", 404));
+  }
+
+  const { number } = req.body;
+
+  if (!number) {
+    return next(new ErrorHandler("Please Phone Number", 400));
+  }
+
+  if (user.role !== "user") {
+    return next(new ErrorHandler("Already seller!!", 401));
+  }
+
+  const code = await user.getOtp();
+  user.phone = number;
+  await user.save({ validateBeforeSave: false });
+
+  const note = `You OTP is ${code}. Valid for 10 minutes`;
+
+  try {
+    console.log(note);
+    // await sendSms({number, note});
+    res.status(200).json({
+      success: true,
+      message: note,
+    });
+  } catch (error) {
+    user.otp = undefined;
+    user.otpExpire = undefined;
+    user.phone = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// OTP Verification and Seller Upgradation
+
+exports.updateRole = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  const { code } = req.body;
+
+  const resp = await User.findOne({
+    otpExpire: { $gt: Date.now() },
+  });
+
+  if (!code && !resp) {
+    user.phone = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("No OTP And OTP Expired!!", 400));
+  } else if (!code) {
+    return next(new ErrorHandler("Please enter OTP", 400));
+  }
+
+  if (!user) {
+    user.phone = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("User not found!!", 404));
+  }
+
+  const isOtp = await user.compareOtp(code);
+
+  if (!isOtp && !resp) {
+    user.phone = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("User Not Found Or Invalid OTP And OTP Expired!!", 401));
+  } else if (!isOtp) {
+    return next(new ErrorHandler("User Not Found Or Invalid OTP", 401));
+  }
+
+  if (!resp) {
+    user.phone = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHandler("OTP is invalid or is expired", 400));
+  }
+
+  user.role = "seller";
+  user.otp = undefined;
+  user.otpExpire = undefined;
+
+  await user.save({ validateBeforeSave: false });
+
+  sendToken(resp, 200, res);
 });

@@ -32,9 +32,14 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
     //   console.log(lawyer.customer.find);
     //   // lawyer.customer.push(details);
     // }
-    const itemExist =  lawyer.customer.find((i)=> i.email === details.email)
-    if(!itemExist){
+    const itemExist = lawyer.customer.find((i) => i.email === details.email);
+    if (!itemExist) {
       lawyer.customer.push(details);
+    }
+    if (order.type === "VIP") {
+      lawyer.vipTicketsSold = lawyer.vipTicketsSold + order.quantity;
+    } else {
+      lawyer.normalTicketsSold = lawyer.normalTicketsSold + order.quantity;
     }
     await lawyer.save({ validateBeforeSave: false });
   });

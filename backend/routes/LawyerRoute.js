@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.route("/lawyer").get(getAllLawyers);
 
-router.route("/lawyer/my").get(isAuthenticatedUser, authorizeRoles("admin") ,getMyLawyer);
+router.route("/lawyer/my").get(isAuthenticatedUser, authorizeRoles("admin","seller") ,getMyLawyer);
 
 router
   .route("/lawyer/feedback/:id")
@@ -26,7 +26,7 @@ router.route("/lawyer/reviews/:id").get(isAuthenticatedUser, getAllReview);  // 
 
 router
   .route("/lawyer/new")
-  .post(isAuthenticatedUser, authorizeRoles("admin"), createLawyer);
+  .post(isAuthenticatedUser, authorizeRoles("admin","seller"), createLawyer);
 
 router
   .route("/lawyer/:id")

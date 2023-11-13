@@ -3,6 +3,7 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const speakeasy = require("speakeasy");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -16,6 +17,11 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please Enter Your Email"],
     unique: true,
     validate: [validator.isEmail, "Please Enter a valid Email"],
+  },
+  phone: {
+    type: String,
+    required: [true, "Please Enter Your Phone Number"],
+    unique: true,
   },
   password: {
     type: String,
@@ -52,6 +58,8 @@ const userSchema = new mongoose.Schema({
 
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  otp: String,
+  otpExpire: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -74,6 +82,11 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Compare OTP
+userSchema.methods.compareOtp = async function (enteredOtp) {
+  return await bcrypt.compare(enteredOtp, this.otp);
+};
+
 // Generqating Password reset token
 userSchema.methods.getResetPasswordToken = function () {
   // Generating token
@@ -87,6 +100,27 @@ userSchema.methods.getResetPasswordToken = function () {
   this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
   return resetToken;
+};
+
+// Generating Verification OTP
+
+userSchema.methods.getOtp = async function () {
+  const secret = speakeasy.generateSecret({ length: 20 });
+
+  // Generate a TOTP code using the secret key
+  const code = speakeasy.totp({
+    // Use the Base32 encoding of the secret key
+    secret: secret.base32,
+
+    // Tell Speakeasy to use the Base32
+    // encoding format for the secret key
+    encoding: "base32",
+  });
+
+  this.otp = await bcrypt.hash(code, 10);
+  this.otpExpire = Date.now() + 1 * 60 * 1000;
+
+  return code;
 };
 
 module.exports = mongoose.model("User", userSchema);
